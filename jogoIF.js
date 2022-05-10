@@ -5,7 +5,8 @@
 const prompt = require("prompt-sync")();
 
 let jogo = true;
-var tempo;
+var tempo = "manhã";
+var tempoPeriodo = ["manhã", "tarde", "noite"];
 
 var inicio = prompt("Deseja iniciar o jogo? ");
 
@@ -14,10 +15,10 @@ if (inicio == "sim") {
     nome: prompt("Digite o nome do seu personagem: "),
     vida: 100,
     falhaNaFuga: function () {
-      return (this.vida = 0);
+      this.vida = 0;
     },
     perdaDeVida: function () {
-      return (this.vida = this.vida - 50);
+      this.vida = this.vida - 50;
     },
     verificaSeTemVida: function () {
       if (this.vida == 0) {
@@ -27,14 +28,7 @@ if (inicio == "sim") {
   };
 } else {
   console.log("Ok, tente novamente depois.");
-}
-
-console.log(
-  "Você está em uma cela em um presídio, seu objetivo é sair da prisão."
-);
-
-function contagemDoTempo() {
-  tempo = tempo++;
+  jogo = false;
 }
 
 function esbarrarGuarda(probabilidade) {
@@ -44,22 +38,24 @@ function esbarrarGuarda(probabilidade) {
 
 // inicia a primeira fase do jogo
 while (jogo == true) {
+  console.log(
+    "Você está em uma cela em um presídio, seu objetivo é sair da prisão."
+  );
   while (inicio == "sim") {
     console.log(
       "Só há uma forma de escapar do presídio, durante o jogo algumas perguntas serão feitas, você acertando, as dicas serão liberadas."
     );
     const personagemPrison = prompt(
-      "Qual o nome do personagem principal da série: Prison Break?"
+      "Qual o nome do personagem principal da série: Prison Break? "
     ).toLowerCase();
     if (personagemPrison == "michael") {
       console.log(
         "Você acertou. Dica: O único caminho para para fugir do presídio é pela enfermaria!"
       );
       inicio = "proximaFase";
-      contagemDoTempo();
     } else {
-      inicio = prompt("Você não acertou, deseja tentar novamente?");
-      tempo = 0;
+      inicio = prompt("Você não acertou, deseja tentar novamente? ");
+      tempo = "manhã";
     }
   }
   while (inicio == "proximaFase") {
@@ -68,7 +64,7 @@ while (jogo == true) {
     );
     console.log();
     const anoSonho = prompt(
-      "Em qual ano foi lançado o filme: Um sonho de Liberdade? "
+      "Em qual ano foi lançado o filme: Um sonho de Liberdade ? "
     );
     console.log();
     if (anoSonho == 1995) {
@@ -79,10 +75,9 @@ while (jogo == true) {
       inicio = "proximaFase02";
       console.log();
     } else {
-      inicio = prompt("você errou, deseja jogar novamente?");
-      tempo = 0;
+      inicio = prompt("você errou, deseja jogar novamente ?");
+      tempo = "manhã";
     }
-    contagemDoTempo();
   }
 
   while (inicio == "proximaFase02") {
@@ -102,13 +97,13 @@ while (jogo == true) {
     }
     if (esbarrou == 0) {
       player.falhaNaFuga();
-      inicio = prompt("O guarde te viu, você perdeu, deseja continuar?");
-      tempo = 0;
+      inicio = prompt("O guarde te viu, você perdeu, deseja continuar? ");
+      tempo = "manhã";
     } else if (esbarrou != 0) {
       console.log("Muito bem, você passou pelo guarda.");
       inicio = "proximaFase03";
+      tempo = "manhã";
     }
-    contagemDoTempo();
   }
   while (inicio == "proximaFase03") {
     console.log(
@@ -120,27 +115,55 @@ while (jogo == true) {
     if (escolhaFase04 == "lincoln") {
       console.log("Parabéns, você acertou.");
       inicio = "proximaFase04";
+      tempo = "tarde";
     } else {
-      inicio = prompt("Você errou, deseja jogar novamente?");
-      tempo = 0;
+      inicio = prompt("Você errou, deseja jogar novamente? ");
+      tempo = "manhã";
     }
-    contagemDoTempo();
   }
 
   while (inicio == "proximaFase04") {
     console.log("Você chegou a enfermaria.");
-    for (let i = 0; i < 5; i++) {
-      esperaAnoitecer = prompt(
-        "Deseja esperar anoitecer? para iniciar a fuga?"
-      ).toLocaleLowerCase();
-      if (esperaAnoitecer == "sim") {
-        tempo = tempo++;
-      } else {
-        break;
+    var desejaEsperar = prompt(
+      "Você pode esperar escurer para fugir (escolha 1), ou pode fugir agora(escolha2)"
+    );
+    if (desejaEsperar == 1) {
+      var escolheuEsperar = "noite";
+      for (let i = 0; i < tempoPeriodo.length; i++) {
+        if (tempo == tempoPeriodo[i]) {
+          tempo = 1;
+        }
       }
-      if (tempo == 8) {
-        break;
+      for (let i = tempo; i < tempoPeriodo.length; i++) {
+        if (escolheuEsperar == tempoPeriodo[i]) {
+          console.log("A noite Chegou!");
+          break;
+        } else {
+          console.log("Ainda não é noite!");
+        }
       }
+      console.log();
+    } else if (desejaEsperar == 2) {
+      player.perdaDeVida();
+      player.verificaSeTemVida();
+    }
+    console.log(player.vida);
+    if (player.vida == 0) {
+      inicio = prompt("Você morreu, deseja iniciar novamente? ");
+    } else if (player.vida != 0) {
+      console.log("Parabéns, você escapou!");
+      inicio = prompt("Parabéns você escapou, deseja jogar novamente? ");
     }
   }
 }
+
+
+/* RESPOSTA CORRETAS:
+
+PERSONAGEM PRINCIPAL DE PRISION BREAK: MICHAEL;
+ANO DE LANÇAMENTO UM SONHO DE LIBERDADE: 1995;
+IRMÃO DO MICHAEL: LINCOLN;
+
+
+
+*/
